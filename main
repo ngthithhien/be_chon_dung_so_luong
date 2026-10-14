@@ -3,593 +3,751 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Bé chọn đúng số lượng</title>
 
 <style>
 :root {
-  --ink:#24458b;
-  --pink:#ff5c9a;
-  --blue:#38a8e8;
-  --green:#53bb72;
-  --purple:#a779e8;
-  --orange:#ffb83e;
+  --ink: #24458b;
+  --pink: #ff5c9a;
+  --blue: #38a8e8;
+  --green: #53bb72;
+  --purple: #a779e8;
+  --orange: #ffb83e;
 }
 
-* { box-sizing:border-box; }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
 
 body {
-  margin:0;
-  font-family:"Trebuchet MS",Arial,sans-serif;
-  color:var(--ink);
-  background:linear-gradient(
-    #8be0ff 0%,#e4faff 52%,
-    #dff8a9 52%,#b8ee83 100%
-  );
-  min-height:100vh;
-  min-height:100dvh;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #dff5ff, #f3ffe8);
+  overflow-x: hidden;
 }
 
-button { font:inherit; cursor:pointer; }
+button {
+  font-family: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
 
 .game {
-  max-width:1400px;
-  margin:auto;
-  padding:clamp(10px,2vw,24px);
-  position:relative;
-  padding-top:76px;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 8px 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.top {
-  display:grid;
-  grid-template-columns:1fr minmax(150px,250px) 1fr;
-  gap:12px;
-  align-items:center;
+/* Tiêu đề và nút */
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(22px, 2.5vw, 36px);
+  line-height: 1.15;
+  color: #f34d91;
+  text-shadow: 1px 2px white;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn {
+  border: 2px solid white;
+  border-radius: 15px;
+  padding: 9px 14px;
+  font-size: clamp(13px, 1.3vw, 18px);
+  font-weight: 900;
+  color: white;
+  box-shadow: 0 3px 0 rgba(36, 69, 139, .15);
+  white-space: nowrap;
+}
+
+.btn-restart {
+  background: var(--purple);
+}
+
+.btn-next {
+  background: var(--pink);
+}
+
+.btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* Khung số mục tiêu */
+.middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .target {
-  background:#fff;
-  border:5px solid #ffbf2f;
-  border-radius:25px;
-  text-align:center;
-  padding:5px 8px;
-  box-shadow:0 5px 0 #e8a31e;
-  width:100%;
-  max-width:250px;
-  justify-self:center;
-}
-
-.target small {
-  display:block;
-  font-size:clamp(12px,1.2vw,16px);
-  font-weight:800;
+  width: min(100%, 460px);
+  height: clamp(185px, 27vh, 275px);
+  border: 8px solid #ffbf27;
+  border-radius: 32px;
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 5px #fff0b8,
+    0 6px 0 #f6dc87;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
 }
 
 #targetNumber {
-  font-size:clamp(62px,7vw,90px);
-  line-height:1;
-  font-weight:900;
-  color:#3551bd;
-  text-shadow:2px 3px #d5ddff;
+  color: #3551bd;
+  font-size: clamp(125px, 15vw, 205px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 3px 4px #d5ddff;
 }
 
-.mascot {
-  font-size:clamp(42px,6vw,78px);
-  text-align:center;
-  filter:drop-shadow(0 4px 0 #ffffff80);
-}
-
-.top-controls {
-  position:absolute;
-  right:clamp(10px,2vw,24px);
-  top:10px;
-  display:flex;
-  gap:8px;
-  z-index:2;
-}
-
-.top-controls .action {
-  font-size:clamp(13px,1.4vw,17px);
-  padding:9px 15px;
-}
-
+/* Điểm và lượt chơi */
 .status {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-  margin:12px 0 10px;
-  font-size:clamp(15px,1.6vw,20px);
-  font-weight:800;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .pill {
-  background:#fff;
-  border:2px solid #ccefff;
-  border-radius:999px;
-  padding:8px 16px;
-  box-shadow:0 3px 0 #b6dfef;
+  background: white;
+  border: 2px solid #b9e7ff;
+  border-radius: 999px;
+  padding: 7px 17px;
+  font-size: clamp(14px, 1.5vw, 19px);
+  font-weight: 900;
+  box-shadow: 0 2px 5px #b8dcef;
 }
 
-#feedback {
-  min-height:38px;
-  text-align:center;
-  font-size:clamp(20px,2.4vw,30px);
-  font-weight:900;
-  color:#e64b88;
-  margin:8px 0 14px;
+/* Phản hồi */
+.feedback {
+  order: 1;
+  min-height: 26px;
+  text-align: center;
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 900;
+  line-height: 1.2;
+  color: #269b53;
+  flex-shrink: 0;
 }
 
-.cards {
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:clamp(7px,1.2vw,16px);
-  align-items:stretch;
+.feedback.error {
+  color: #ef4c7d;
 }
 
-.card {
-  min-width:0;
-  min-height:clamp(190px,25vw,310px);
-  background:#fffdfb;
-  border:5px solid var(--border);
-  border-radius:26px;
-  padding:clamp(6px,1vw,14px);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  box-shadow:0 5px 0 color-mix(in srgb,var(--border),white 35%);
-  transition:transform .15s,box-shadow .15s;
-  position:relative;
-  overflow:hidden;
-  touch-action:manipulation;
-  user-select:none;
-  -webkit-user-select:none;
+/* 5 khung hình: bo tròn 4 góc, cách mép dưới 12px */
+.choices {
+  order: 2;
+  width: min(100%, 1350px);
+  height: clamp(230px, 40vh, 365px);
+  margin: auto auto 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(8px, 1vw, 14px);
+  align-items: stretch;
+  flex-shrink: 0;
 }
 
-.card:hover { transform:translateY(-4px); }
-
-.card:focus-visible {
-  outline:5px solid #263e9a;
-  outline-offset:3px;
+.choice {
+  min-width: 0;
+  min-height: 0;
+  border: 5px solid var(--card-color, #38a8e8);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: inset 0 0 0 3px var(--soft-color, #e7f7ff);
+  padding: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: transform .15s, background .15s;
 }
 
-.card.correct {
-  background:#e9ffec;
-  border-color:#22b75a;
-  box-shadow:0 0 0 5px #a4efb5;
+.choice:hover:not(:disabled) {
+  transform: translateY(-3px);
 }
 
-.card.wrong {
-  background:#fff0f1;
-  border-color:#ff5367;
-  animation:shake .25s linear 2;
+.choice:focus-visible,
+.btn:focus-visible {
+  outline: 4px solid #24458b;
+  outline-offset: 2px;
 }
 
-.card:disabled { cursor:default; }
-
-.objects {
-  width:100%;
-  max-width:100%;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  align-content:center;
-  justify-items:center;
-  align-items:center;
-  gap:clamp(3px,.7vw,9px);
-  flex:1;
-  min-height:0;
+.choice.correct {
+  background: #e8ffed;
+  border-color: #28aa5a;
+  box-shadow: inset 0 0 0 3px #c7f6d3;
 }
 
-.object {
-  font-size:clamp(22px,3.4vw,48px);
-  line-height:1.05;
-  max-width:100%;
-  display:block;
-  text-align:center;
-  filter:drop-shadow(0 2px 0 #0000000b);
-  user-select:none;
-  -webkit-user-select:none;
+.choice.wrong {
+  background: #fff0f4;
+  border-color: #ff5c8b;
 }
 
-/* Không hiển thị nhãn chữ trong các khung */
-.card-label {
-  display:none;
+/* Hình lớn và rõ */
+.picture {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  gap: 0;
 }
 
-.bottom { display:none; }
-
-.action {
-  border:0;
-  border-radius:999px;
-  padding:13px 25px;
-  font-size:clamp(17px,1.8vw,22px);
-  font-weight:900;
-  color:white;
-  background:var(--pink);
-  box-shadow:0 5px 0 #d83e78;
+.emoji {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(36px, 4vw, 60px);
+  line-height: 1;
+  text-align: center;
+  filter: drop-shadow(0 2px 1px #ddd);
 }
 
-.action.secondary {
-  background:#4a9ce8;
-  box-shadow:0 5px 0 #2674bb;
-}
-
-.action:active {
-  transform:translateY(3px);
-  box-shadow:0 2px 0 #b33c70;
-}
-
-.footer {
-  text-align:center;
-  font-size:14px;
-  color:#32634d;
-  font-weight:700;
-  margin:16px 0;
-}
-
-.overlay {
-  position:fixed;
-  inset:0;
-  background:#16315bbd;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  z-index:5;
-}
-
-.overlay.show { display:flex; }
-
+/* Hộp kết quả */
 .modal {
-  max-width:500px;
-  width:100%;
-  background:#fffdf5;
-  border:6px solid #ffca4d;
-  border-radius:32px;
-  padding:28px;
-  text-align:center;
-  box-shadow:0 10px 0 #bb8a25;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(24, 43, 85, .5);
 }
 
-.modal h2 {
-  font-size:clamp(28px,5vw,42px);
-  margin:5px 0;
-  color:#e84d8a;
+.modal.show {
+  display: flex;
 }
 
-.modal p {
-  font-size:22px;
-  font-weight:800;
+.modal-card {
+  width: min(100%, 460px);
+  padding: 25px 20px;
+  border: 5px solid #ffbf27;
+  border-radius: 28px;
+  background: white;
+  text-align: center;
 }
 
-@keyframes shake {
-  25% { transform:translateX(-5px); }
-  75% { transform:translateX(5px); }
+.modal-card h2 {
+  margin: 0 0 12px;
+  color: #f34d91;
+  font-size: clamp(26px, 4vw, 38px);
 }
 
-@media(max-width:760px) {
-  .game { padding:70px 10px 14px; }
-
-  
-.top {
-  grid-template-columns:minmax(0,1fr) minmax(130px,200px);
-  gap:9px;
+.modal-card p {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.4;
 }
 
-.target {
-  grid-column:2;
-  grid-row:1;
-  border-width:4px;
-  border-radius:20px;
-  max-width:200px;
-  min-height:120px;
-  padding:8px;
-}
-
-#targetNumber {
-  font-size:clamp(64px,9vw,82px);
-}
-
-  .cards {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
+/* Màn hình máy tính thấp */
+@media (max-height: 760px) and (min-width: 601px) {
+  .game {
+    gap: 5px;
+    padding: 6px 8px 0;
   }
 
-  .card:last-child {
-    grid-column:1/-1;
-    min-height:150px;
+  .target {
+    height: clamp(150px, 23vh, 205px);
   }
 
-  .object { font-size:clamp(25px,7vw,42px); }
-
-  .card {
-    min-height:170px;
-    border-width:4px;
-    border-radius:20px;
+  #targetNumber {
+    font-size: clamp(115px, 12vw, 165px);
   }
 
-  .objects { max-width:100%; gap:5px; }
-
-  .card-label {
-    font-size:12px;
-    padding:5px 10px;
+  .choices {
+    height: clamp(205px, 38vh, 290px);
   }
 
-  .top-controls { top:8px; right:10px; }
-
-  .top-controls .action {
-    padding:8px 11px;
-    font-size:13px;
+  .emoji {
+    font-size: clamp(32px, 3.5vw, 49px);
   }
 
-  .status { margin:10px 0 6px; }
-  .footer { margin:12px 0; }
+  .pill {
+    padding: 5px 14px;
+  }
+
+  .feedback {
+    min-height: 22px;
+  }
 }
 
-@media(max-width:390px) {
-  .game { padding-left:7px; padding-right:7px; }
-  .cards { gap:7px; }
-
-  .card {
-    padding:6px;
-    min-height:148px;
-    border-width:3px;
+/* Điện thoại */
+@media (max-width: 600px) {
+  .game {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 6px 6px 0;
+    gap: 6px;
   }
 
-  .object { font-size:clamp(22px,7vw,29px); }
-  .objects { gap:3px; }
-  .target { padding:5px; }
-  .mascot { font-size:40px; }
+  .topbar {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
 
-  .top-controls .action {
-    padding:7px 9px;
+  h1 {
+    font-size: clamp(21px, 5.5vw, 29px);
+  }
+
+  .controls {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 7px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .target {
+    width: min(100%, 300px);
+    height: clamp(150px, 21vh, 190px);
+    border-width: 6px;
+    border-radius: 24px;
+  }
+
+  #targetNumber {
+    font-size: clamp(115px, 28vw, 155px);
+  }
+
+  .status {
+    gap: 7px;
+  }
+
+  .pill {
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+
+  /* 3 khung trên, 2 khung dưới */
+  .choices {
+    width: 100%;
+    height: clamp(300px, 44vh, 410px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .choice {
+    grid-column: span 2;
+    border-width: 4px;
+    border-radius: 18px;
+    padding: 3px;
+  }
+
+  .choice:nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+
+  .choice:nth-child(5) {
+    grid-column: 4 / span 2;
+  }
+
+  .picture {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .emoji {
+    font-size: clamp(28px, 8vw, 44px);
+  }
+
+  .feedback {
+    min-height: 22px;
+    font-size: clamp(14px, 4vw, 19px);
+  }
+}
+
+/* Điện thoại rất nhỏ */
+@media (max-width: 380px) {
+  .game {
+    padding: 4px 4px 0;
+    gap: 5px;
+  }
+
+  .target {
+    height: 135px;
+  }
+
+  #targetNumber {
+    font-size: 110px;
+  }
+
+  .choices {
+    height: 285px;
+    gap: 5px;
+  }
+
+  .choice {
+    border-width: 3px;
+    border-radius: 15px;
+    padding: 2px;
+  }
+
+  .emoji {
+    font-size: clamp(24px, 7.5vw, 33px);
+  }
+}
+
+/* Điện thoại nằm ngang */
+@media (max-height: 570px) and (max-width: 900px) {
+  .game {
+    gap: 4px;
+    padding: 4px 4px 0;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  h1 {
+    font-size: 19px;
+  }
+
+  .btn {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .target {
+    height: 95px;
+    width: 180px;
+    border-width: 4px;
+    border-radius: 16px;
+  }
+
+  #targetNumber {
+    font-size: 75px;
+  }
+
+  .choices {
+    height: 190px;
+    gap: 5px;
+  }
+
+  .choice {
+    padding: 2px;
+    border-radius: 15px;
+  }
+
+  .emoji {
+    font-size: clamp(20px, 5vh, 31px);
+  }
+
+  .feedback {
+    min-height: 18px;
+    font-size: 14px;
   }
 }
 </style>
 </head>
 
 <body>
-<main class="game">
+<div class="game">
 
-  <div class="top-controls">
-    <button class="action secondary" id="repeatBtn" type="button">
-      🔄 Chơi lại
-    </button>
-    <button class="action" id="nextBtn" type="button" hidden>
-      Câu tiếp ➜
-    </button>
-  </div>
+  <header class="topbar">
+    <h1>🌈 Bé chọn đúng số lượng 🌈</h1>
 
-  <section class="top">
-    <div class="mascot" aria-hidden="true">🐝🌼</div>
+    <div class="controls">
+      <button class="btn btn-restart" id="restartBtn">
+        🔄 Chơi lại
+      </button>
 
-    <div class="target">
-      <small>BÉ TÌM SỐ LƯỢNG</small>
-      <div id="targetNumber">5</div>
+      <button class="btn btn-next" id="nextBtn" disabled>
+        ➡️ Câu tiếp
+      </button>
     </div>
+  </header>
 
-    <div class="mascot" aria-hidden="true">🌈⭐</div>
+  <section class="middle">
+    <div class="target">
+      <div id="targetNumber" aria-live="polite">3</div>
+    </div>
   </section>
 
-  <section class="status">
-    <span class="pill" id="roundText">Câu 1 / 5</span>
-    <span class="pill">⭐ Điểm: <span id="score">0</span></span>
-  </section>
-
-  <div id="feedback" role="status" aria-live="polite">
-    Con quan sát thật kỹ nhé!
+  <div class="status">
+    <div class="pill" id="roundText">⭐ Lượt: 1/5</div>
+    <div class="pill" id="scoreText">🏆 Điểm: 0</div>
   </div>
 
-  <section class="cards" id="cards"
-           aria-label="Năm khung hình để lựa chọn">
-  </section>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
 
-  <div class="footer">
-    🌻 Bé thật giỏi – Bé chọn thật đúng! 🌻
-  </div>
+  <section class="choices" id="choices"
+           aria-label="Các nhóm hình"></section>
+</div>
 
-</main>
+<div class="modal" id="resultModal"
+     role="dialog" aria-modal="true">
 
-<div class="overlay" id="finishOverlay"
-     role="dialog" aria-modal="true"
-     aria-labelledby="finishTitle">
+  <div class="modal-card">
+    <h2>🎉 Chúc mừng bé! 🎉</h2>
+    <p id="resultMessage"></p>
 
-  <div class="modal">
-    <div style="font-size:68px">🏆🎉</div>
-    <h2 id="finishTitle">Hoan hô!</h2>
-    <p id="finishText">Con đã hoàn thành trò chơi!</p>
-    <button class="action" id="againBtn" type="button">
-      Chơi lại nào! 🔄
+    <button class="btn btn-restart" id="playAgainBtn">
+      🔄 Chơi lại nhé!
     </button>
   </div>
 </div>
 
+<audio id="winAudio" src="win.mp3" preload="auto"></audio>
+<audio id="wrongAudio" src="sai.mp3" preload="auto"></audio>
+
 <script>
-const palettes = [
-  {border:"#ff5c91", emoji:"🍎"},
-  {border:"#3aa8e8", emoji:"⭐"},
-  {border:"#54bd72", emoji:"🐠"},
-  {border:"#a779e8", emoji:"🌸"},
-  {border:"#ffb83e", emoji:"🦋"}
+const groups = [
+  {
+    count: 3,
+    emoji: "⭐",
+    name: "Ngôi sao",
+    color: "#38a8e8",
+    soft: "#e5f7ff"
+  },
+  {
+    count: 4,
+    emoji: "🦋",
+    name: "Con bướm",
+    color: "#ffb83e",
+    soft: "#fff2d9"
+  },
+  {
+    count: 5,
+    emoji: "🌸",
+    name: "Bông hoa",
+    color: "#a779e8",
+    soft: "#f1e8ff"
+  },
+  {
+    count: 6,
+    emoji: "🐠",
+    name: "Con cá",
+    color: "#53bb72",
+    soft: "#e4f9e8"
+  },
+  {
+    count: 7,
+    emoji: "🍎",
+    name: "Quả táo",
+    color: "#ff5c9a",
+    soft: "#ffe7f0"
+  }
 ];
 
-let rounds = [];
-let roundIndex = 0;
+const targetNumber = document.getElementById("targetNumber");
+const choicesEl = document.getElementById("choices");
+const roundText = document.getElementById("roundText");
+const scoreText = document.getElementById("scoreText");
+const feedback = document.getElementById("feedback");
+const nextBtn = document.getElementById("nextBtn");
+const restartBtn = document.getElementById("restartBtn");
+const resultModal = document.getElementById("resultModal");
+const resultMessage = document.getElementById("resultMessage");
+const playAgainBtn = document.getElementById("playAgainBtn");
+const winAudio = document.getElementById("winAudio");
+const wrongAudio = document.getElementById("wrongAudio");
+
+let round = 0;
 let score = 0;
-let locked = false;
+let targets = [];
+let currentTarget = null;
+let answered = false;
 
-const $ = id => document.getElementById(id);
+function shuffle(array) {
+  const result = [...array];
 
-/* Tệp âm thanh đặt cùng thư mục với HTML */
-const soundWin = new Audio("win.mp3");
-const soundWrong = new Audio("sai.mp3");
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
 
-soundWin.preload = "auto";
-soundWrong.preload = "auto";
+  return result;
+}
 
 function playSound(audio) {
-  audio.pause();
   audio.currentTime = 0;
+  const promise = audio.play();
 
-  const result = audio.play();
-
-  if (result && typeof result.catch === "function") {
-    result.catch(error => {
-      console.warn("Không phát được âm thanh:", error);
-    });
+  if (promise && promise.catch) {
+    promise.catch(() => {});
   }
 }
 
-function shuffle(arr) {
-  const a = [...arr];
+function updateStatus() {
+  roundText.textContent =
+    `⭐ Lượt: ${Math.min(round + 1, 5)}/5`;
 
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-
-  return a;
+  scoreText.textContent = `🏆 Điểm: ${score}`;
 }
 
-function makeRounds() {
-  const targets = shuffle([3, 4, 5, 6, 7]);
+function renderChoices() {
+  choicesEl.innerHTML = "";
 
-  rounds = targets.map(target => ({
-    target,
-    counts: shuffle([3, 4, 5, 6, 7])
-  }));
-}
+  shuffle(groups).forEach(group => {
+    const card = document.createElement("button");
 
-function renderRound() {
-  locked = false;
+    card.type = "button";
+    card.className = "choice";
+    card.style.setProperty("--card-color", group.color);
+    card.style.setProperty("--soft-color", group.soft);
+    card.style.setProperty("--shadow-color", group.soft);
 
-  const r = rounds[roundIndex];
-
-  $("targetNumber").textContent = r.target;
-  $("roundText").textContent =
-    `Câu ${roundIndex + 1} / ${rounds.length}`;
-  $("score").textContent = score;
-
-  $("feedback").textContent = "Con quan sát thật kỹ nhé!";
-  $("feedback").style.color = "#e64b88";
-  $("nextBtn").hidden = true;
-
-  const cards = $("cards");
-  cards.innerHTML = "";
-
-  const cardPalettes = shuffle(palettes);
-
-  r.counts.forEach((count, i) => {
-    const p = cardPalettes[i];
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "card";
-    btn.style.setProperty("--border", p.border);
-    btn.setAttribute(
+    card.setAttribute(
       "aria-label",
-      `Khung ${i + 1}, có ${count} hình`
+      `Nhóm có ${group.count} hình`
     );
 
-    const objects = document.createElement("div");
-    objects.className = "objects";
+    const picture = document.createElement("div");
+    picture.className = "picture";
 
-    for (let k = 0; k < count; k++) {
-      const span = document.createElement("span");
-      span.className = "object";
-      span.textContent = p.emoji;
-      span.setAttribute("aria-hidden", "true");
-      objects.appendChild(span);
+    for (let i = 0; i < group.count; i++) {
+      const item = document.createElement("span");
+
+      item.className = "emoji";
+      item.textContent = group.emoji;
+      item.setAttribute("aria-hidden", "true");
+
+      picture.appendChild(item);
     }
 
-    btn.appendChild(objects);
+    card.appendChild(picture);
 
-    btn.addEventListener("click", () => {
-      choose(btn, count, r.target);
+    card.addEventListener("click", () => {
+      checkAnswer(card, group.count);
     });
 
-    cards.appendChild(btn);
+    choicesEl.appendChild(card);
   });
 }
 
-function choose(btn, count, target) {
-  if (locked) return;
+function startRound() {
+  if (round >= 5) {
+    finishGame();
+    return;
+  }
 
-  if (count === target) {
-    playSound(soundWin);
+  currentTarget = targets[round];
+  answered = false;
 
-    locked = true;
+  targetNumber.textContent = currentTarget;
+  feedback.textContent = "";
+  feedback.classList.remove("error");
+
+  nextBtn.disabled = true;
+  nextBtn.textContent = "➡️ Câu tiếp";
+
+  renderChoices();
+  updateStatus();
+}
+
+function checkAnswer(card, selectedCount) {
+  if (answered) return;
+
+  if (selectedCount === currentTarget) {
+    answered = true;
     score++;
 
-    btn.classList.add("correct");
+    card.classList.add("correct");
 
-    $("feedback").textContent = "🎉 Chính xác! Con giỏi quá!";
-    $("feedback").style.color = "#159447";
-
-    [...$("cards").children].forEach(card => {
-      card.disabled = true;
+    document.querySelectorAll(".choice").forEach(button => {
+      button.disabled = true;
     });
 
-    $("score").textContent = score;
+    feedback.textContent = "🎉 Chính xác! Con giỏi quá!";
+    feedback.classList.remove("error");
 
-    if (roundIndex < rounds.length - 1) {
-      $("nextBtn").hidden = false;
-    } else {
-      setTimeout(showFinish, 650);
-    }
+    playSound(winAudio);
+
+    nextBtn.disabled = false;
+    nextBtn.textContent =
+      round === 4 ? "🏁 Xem kết quả" : "➡️ Câu tiếp";
+
+    updateStatus();
 
   } else {
-    playSound(soundWrong);
+    card.classList.remove("wrong");
+    void card.offsetWidth;
+    card.classList.add("wrong");
 
-    btn.classList.remove("wrong");
-    void btn.offsetWidth;
-    btn.classList.add("wrong");
+    feedback.textContent = "😊 Con thử lại nhé!";
+    feedback.classList.add("error");
 
-    $("feedback").textContent =
-      "😊 Chưa đúng rồi, con thử lại nhé!";
-    $("feedback").style.color = "#e34a5d";
+    playSound(wrongAudio);
 
     setTimeout(() => {
-      btn.classList.remove("wrong");
+      card.classList.remove("wrong");
     }, 650);
   }
 }
 
-function showFinish() {
-  $("finishText").textContent =
-    `Con trả lời đúng ${score} / ${rounds.length} câu. ` +
+function finishGame() {
+  resultMessage.textContent =
+    `Bé trả lời đúng ${score}/5 câu. ` +
     (score === 5
-      ? "Tuyệt vời! Con là nhà toán học nhí!"
-      : "Cố gắng thêm nhé, mình cùng chơi lại nào!");
+      ? "Tuyệt vời! Bé giỏi quá! 🌟"
+      : "Bé hãy chơi lại để giỏi hơn nhé! 💖");
 
-  $("finishOverlay").classList.add("show");
+  resultModal.classList.add("show");
+  nextBtn.disabled = true;
 }
 
 function startGame() {
-  rounds = [];
-  roundIndex = 0;
+  round = 0;
   score = 0;
+  targets = shuffle([3, 4, 5, 6, 7]);
 
-  $("finishOverlay").classList.remove("show");
-
-  makeRounds();
-  renderRound();
+  resultModal.classList.remove("show");
+  startRound();
 }
 
-$("nextBtn").addEventListener("click", () => {
-  if (roundIndex < rounds.length - 1) {
-    roundIndex++;
-    renderRound();
+nextBtn.addEventListener("click", () => {
+  if (!answered) return;
+
+  if (round < 4) {
+    round++;
+    startRound();
+  } else {
+    round = 5;
+    updateStatus();
+    finishGame();
   }
 });
 
-$("repeatBtn").addEventListener("click", startGame);
-$("againBtn").addEventListener("click", startGame);
+restartBtn.addEventListener("click", startGame);
+playAgainBtn.addEventListener("click", startGame);
 
 startGame();
 </script>
